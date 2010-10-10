@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) David Durman & Ales Sturala 2010.
+ */
+
 var canvas, enemy1, enemy2, logic,
     enemy1Playfield, enemy2Playfield, enemies = {},
     activeEnemy = null, audio;
@@ -119,9 +123,9 @@ var Setup = function(){
         var rand = Math.random();
         if (rand < 0.15){
             Bonus.rotate(activeEnemy);
-        } else if (0.4){
+        } else if (rand < 0.3){
             Bonus.project(activeEnemy);
-        } else if (rand < 0.8) {
+        } else if (rand < 0.7) {
             Bonus.prolong(activeEnemy);
         } else {
             Bonus.shake(activeEnemy);

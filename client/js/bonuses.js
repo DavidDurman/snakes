@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) David Durman & Ales Sturala 2010.
+ */
+
 var Bonus = {
     prolong: function(enemy){
         Communicator.send({ action: "fire", value: "prolong", id: enemy.uid });

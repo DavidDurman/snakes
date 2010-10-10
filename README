@@ -1,0 +1,33 @@
+Multiplayer Snake Game. This game was created in 15 hours during HTML 5 Game Jam 
+on 9.10.2010 - 10.10.2010 October in Hilversum, the Netherlands.
+
+----------------------------------------------------------------
+
+Snakes is based on simple concept of usual Snake games. The main
+difference is that Snakes is a multiplayer game and therefore
+allows interaction between players. Thanks to the HTML 5 and
+CSS 3 technology, various 3D effects are present.
+
+----------------------------------------------------------------
+
+Authors: David Durman & Ales Sturala.
+
+----------------------------------------------------------------
+
+Snakes uses latest HTML 5 features like Websockets, Canvas and Audio.
+The communication between browsers is implemented thanks to
+Nodejs, antinode and node-websocket-server.
+
+The only browser tested was Google Chrome 7.0.544.0 dev.
+
+----------------------------------------------------------------
+
+INSTALLATION:
+
+0. Install Node (www.nodejs.org).
+1. Set IP of the websocket server in client/globals.js (WebSocketServerIP).
+2. sudo mkdir -p /www/default
+3. ./run.sh
+4. Open browser, go to http://localhost:8080/index.html
+5. Other player on the same net goes to http://WebSocketServerIP:8080/index.html.
+

@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) David Durman & Ales Sturala 2010.
+ */
+
 var InputHandler = {
     delegee: null,      // receiver of input events (could be the same as target)
     root: document,

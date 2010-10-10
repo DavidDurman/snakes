@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) David Durman & Ales Sturala 2010.
+ */
+
 var system = {
     env: {},
     init: function init(){

@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) David Durman & Ales Sturala 2010.
+ */
+
 if (!Function.prototype.bind)
     Function.prototype.bind = function(context /*, arg1, arg2... */) {
         "use strict";

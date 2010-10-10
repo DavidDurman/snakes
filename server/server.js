@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) David Durman & Ales Sturala 2010.
+ */
+
 var ws = require("../lib/node-websocket-server/lib/ws"),
     server = ws.createServer(),
     ConnectionTable = [];
