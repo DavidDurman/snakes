@@ -1,0 +1,77 @@
+body { 
+  background-color: #0C2614;
+  background-color: #260c11;
+  background-color: #373f41;
+}
+
+h1 { 
+  text-align: center;
+  text-shadow: 2px 2px 2px white;
+  font-size: 30px;
+  color: white;
+  border-radius: 10px;
+}
+
+#flashmessage { 
+  position: absolute;
+  left: 170px;
+  top: 50px;
+  color: black;
+  background-color: lightblue;
+  border-radius: 10px;
+  padding: 5px 10px;
+  -webkit-box-shadow: 6px 6px 3px #888; 
+  visibility: visible;
+}
+
+#flashmessage:empty { 
+  visibility: hidden;
+}
+
+#stats { 
+  color: white;
+}
+
+.page { 
+  margin: 0 auto 0 auto;
+  width: 400px;
+
+}
+
+.enemy {  
+  position: absolute;
+  top: 42px;
+/*  border: 3px solid gray; */
+  border-radius: 5px;
+  -webkit-transform: rotateX(30deg);  
+  -webkit-transition: -webkit-transform 0.1s linear;
+
+/*  -webkit-box-shadow: 10px 10px 5px #888;  */
+  -webkit-box-shadow: 10px 10px 5px #1d0705;
+/*  padding: 5px 5px 5px 15px; */
+  background-image: url("../images/saturn.gif");
+}
+.enemy.left {  
+  left: -195px;
+}
+.enemy.right { 
+  -webkit-box-shadow: -10px 10px 5px #1d0705;
+  left: 415px;
+}
+
+#application {  
+  -webkit-perspective: 600px;
+}
+
+#playfield { 
+  background-image: url("../images/mars.jpg");
+  -webkit-transform: rotateX(30deg);  
+  -webkit-transition: -webkit-transform 0.7s linear;
+  border-radius: 15px;
+  position: absolute;
+  left: 10px;
+  top: 30px;
+/*  -webkit-transform-style: preserve-3d;  */
+/*  -webkit-transform: rotateX(30deg); */
+/*  -webkit-transition: -webkit-transform 0.7s linear; */
+}
