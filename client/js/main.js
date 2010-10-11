@@ -35,7 +35,7 @@ var Received = function(data){
         SetupUser(data.id);
         break;
       case "close":
-        Communicator.send({ action: "died", id: User.id });
+//        Communicator.send({ action: "died", id: User.id });
 //        _("Connection closed.");
         break;
       case "ready":
@@ -48,7 +48,7 @@ var Received = function(data){
         if (data.id != User.id){
             // @todo Terrible code!!!
             if (!enemies[data.id]){
-                if (keys(enemies) == 1){
+                if (keys(enemies).length == 1){
                     enemies[data.id] = enemy2Playfield;
                 } else {
                     enemies[data.id] = enemy1Playfield;
