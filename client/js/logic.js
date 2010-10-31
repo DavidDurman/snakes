@@ -106,8 +106,10 @@ var Logic = {
             this.consumed_flowers++;
             this.on_bonus();
         }
-        else if (code == 100 && this.field[new_index] >= 101)                       // snake body
+        else if (code == 100 && this.field[new_index] >= 101){                       // snake body
             this.is_dead = true;
+            Stats.hit();            
+        }
 
         // if on tail-1 cell => test if snake is supposed to shrink => if so clear tail-1 and tail point
         var tail_code = this.field.max();
