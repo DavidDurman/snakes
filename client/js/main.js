@@ -124,16 +124,18 @@ var Setup = function(){
     var gameCanvas = Object.create(GameCanvas).init(canvas, 400, 400, 10, 10);
     logic = Object.create(Logic).init(gameCanvas);
     logic.on_bonus = function(){
+        
         var rand = Math.random();
-        if (rand < 0.15){
-            Bonus.rotate(activeEnemy);
-        } else if (rand < 0.3){
-            Bonus.project(activeEnemy);
-        } else if (rand < 0.7) {
-            Bonus.prolong(activeEnemy);
-        } else {
-            Bonus.shake(activeEnemy);
+
+        var i = 0, len = BONUS.probabilities.length, prob;
+        for (; i < len; i++ ) {
+            prob = BONUS.probabilities[i];
+            if (rand < +prob){
+                Bonus[ BONUS.probabilityTable[prob] ](activeEnemy);
+                break;  // find only the first applicable one
+            }
         }
+        
     };
 
     InputHandler.init({ delegee: KeyResolver.get(mixin(logic, {

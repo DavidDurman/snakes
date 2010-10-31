@@ -21,20 +21,34 @@ var AUDIO = {
     }
 };
 
+var BONUS = {
+    probabilityTable: {
+        '0.15': 'rotate',
+        '0.3': 'project',
+        '0.7': 'prolong',
+        '1.0': 'shake'
+    }
+};
+
+BONUS.probabilities = Object.keys( BONUS.probabilityTable );
+BONUS.probabilities.sort( function( a, b ) {
+    return +a > +b;
+} );
+
 var SNAKE = {
     body: {
-//        type: "arc",
-//        type: "rect",
+        //        type: "arc",
+        //        type: "rect",
         type: "text",        
-//        type: "sin",
+        //        type: "sin",
         
-//        strokeStyle: "#FF00FF",
-//        fillStyle: "#FFFF00",
+        //        strokeStyle: "#FF00FF",
+        //        fillStyle: "#FFFF00",
         strokeStyle: "white",
         fillStyle: "white",
 
         factor: 1.5,
-//        text: "\u00D7", // cross
+        //        text: "\u00D7", // cross
         text: "\u2605", // star
         font: "14px Arial"
     },
@@ -44,8 +58,8 @@ var SNAKE = {
 };
 
 var PLAYFIELD = {
-//    fillStyle: "#e6f107"
-//    fillStyle: "#b8e612"
+    //    fillStyle: "#e6f107"
+    //    fillStyle: "#b8e612"
     wall: {
         fillStyle: "rgba(0, 0, 0, 0.1)"
     }
@@ -60,4 +74,5 @@ if ( typeof require !== "undefined" ) {
     exports.SERVER = SERVER;
     exports.SNAKE = SNAKE;
     exports.PLAYFIELD = PLAYFIELD;
+    exports.BONUS = BONUS;    
 }
