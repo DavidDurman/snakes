@@ -2,6 +2,9 @@
  * Copyright (c) David Durman & Ales Sturala 2010.
  */
 
+var PI = Math.PI;
+var TWOPI = PI * 2;
+
 if (!Function.prototype.bind)
     Function.prototype.bind = function(context /*, arg1, arg2... */) {
         "use strict";

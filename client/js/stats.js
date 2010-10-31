@@ -3,16 +3,20 @@
  */
 
 var Stats = {
+    
     flashmessage: null,
-    init: function(){
+    
+    init: function() {
         this.flashmessage = document.getElementById("flashmessage");
     },
-    hit: function(){
+    
+    hit: function() {
         this.flash("You died a slow, painful death.");
         Communicator.send({ action: "died", id: User.id });
-        audio.play();
+        Audio.play("hit");
     },
-    flash: function(str){
+    
+    flash: function( str ) {
         this.flashmessage.innerHTML = str;
     }
 };

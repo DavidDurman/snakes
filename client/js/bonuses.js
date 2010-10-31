@@ -3,21 +3,28 @@
  */
 
 var Bonus = {
-    prolong: function(enemy){
+    
+    prolong: function( enemy ) {
+        Audio.play( 'prolong' );
         Communicator.send({ action: "fire", value: "prolong", id: enemy.uid });
     },
-    project: function(enemy, nsend){
+    
+    project: function( enemy, nsend ) {
         enemy.style.webkitTransform = "rotateY(-120deg)";
         if (!nsend){
+            Audio.play( 'project' );
             Communicator.send({ action: "fire", value: "project", id: enemy.uid });
         }
         setTimeout(function(){
             enemy.style.webkitTransform = null;
         }, 5000);
+
     },
-    shake: function(enemy, nsend){
+    
+    shake: function( enemy, nsend ) {
         //        enemy.style.webkitTransform = "rotateX(30deg) scale(1.2)";
         if (!nsend){
+            Audio.play( 'shake' );            
             Communicator.send({ action: "fire", value: "shake", id: enemy.uid });
         }
         enemy.style.webkitTransition = "none";
@@ -40,15 +47,18 @@ var Bonus = {
             }, 100);
         }, 100);
     },
-    rotate: function(enemy, nsend){
+    
+    rotate: function( enemy, nsend ) {
         enemy.style.webkitTransform = "rotateX(30deg) rotateZ(-180deg)";
-        if (!nsend){
+        if ( !nsend ) {
+            Audio.play( 'rotate' );            
             Communicator.send({ action: "fire", value: "rotate", id: enemy.uid });
         }
-        setTimeout(function(){
+        setTimeout( function() {
             enemy.style.webkitTransform = null;
-        }, 5000);
+        }, 5000 );
     }
+    
 };
 
 

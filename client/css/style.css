@@ -20,8 +20,26 @@ h1 {
   background-color: lightblue;
   border-radius: 10px;
   padding: 5px 10px;
-  -webkit-box-shadow: 6px 6px 3px #888; 
+  -webkit-box-shadow: 6px 6px 10px #888; 
   visibility: visible;
+}
+
+#cannon { 
+  background-image: url(../images/cannon.png);
+  background-size: 100% 100%;
+  width: 80px;
+  height: 50px;
+  position: absolute;
+  left: 600px;
+  top: 65px;
+  -webkit-transform: rotateZ(-10deg);
+  -webkit-transform: rotateY(180deg); 
+}
+#cannon.left { 
+  -webkit-transform: rotateY(180deg); 
+}
+#cannon.right { 
+  -webkit-transform: rotateY(0deg); 
 }
 
 #flashmessage:empty { 
@@ -41,22 +59,22 @@ h1 {
 .enemy {  
   position: absolute;
   top: 42px;
-/*  border: 3px solid gray; */
+  background: #2f3537;
+
   border-radius: 5px;
   -webkit-transform: rotateX(30deg);  
   -webkit-transition: -webkit-transform 0.1s linear;
 
-/*  -webkit-box-shadow: 10px 10px 5px #888;  */
-  -webkit-box-shadow: 10px 10px 5px #1d0705;
 /*  padding: 5px 5px 5px 15px; */
-  background-image: url("../images/saturn.gif");
+/*  background-image: url("../images/saturn.gif"); */
 }
 .enemy.left {  
   left: -195px;
+  -webkit-box-shadow: 2px 2px 50px #1d0705;
 }
 .enemy.right { 
-  -webkit-box-shadow: -10px 10px 5px #1d0705;
-  left: 415px;
+  -webkit-box-shadow: -2px 2px 50px #1d0705;
+  left: 425px;
 }
 
 #application {  
@@ -64,10 +82,11 @@ h1 {
 }
 
 #playfield { 
-  background-image: url("../images/mars.jpg");
+/*  background-image: url("../images/mars.jpg"); */
   -webkit-transform: rotateX(30deg);  
   -webkit-transition: -webkit-transform 0.7s linear;
   border-radius: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
   position: absolute;
   left: 10px;
   top: 30px;

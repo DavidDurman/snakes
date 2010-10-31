@@ -18,7 +18,7 @@ var Communicator = {
         this.connect();
     },
     connect: function(){
-        this.socket = new WebSocket(WebSocketAddress);
+        this.socket = new WebSocket(SERVER.WS_SERVER_ADDRESS);
         this.socket.onmessage = this.receive.bind(this);
         this.socket.onerror = this.error.bind(this);
         this.socket.onopen = this.open.bind(this);

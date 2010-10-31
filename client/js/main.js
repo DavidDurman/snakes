@@ -12,6 +12,11 @@ function activateEnemy(enemy){
     }
     activeEnemy = enemy;
     enemy.style.borderTop = "2px solid red";
+    if (enemy === enemy1){
+        document.getElementById("cannon").className = "left";
+    } else {
+        document.getElementById("cannon").className = "right";        
+    }
 }
 
 /**
@@ -91,8 +96,7 @@ var Received = function(data){
 
 var Setup = function(){
     Stats.init();
-
-    audio = document.getElementById("audio");
+    Audio.init();
 
     canvas = document.createElement("canvas");
     canvas.setAttribute("id", "playfield");

@@ -25,9 +25,11 @@ The only browser tested was Google Chrome 7.0.544.0 dev.
 INSTALLATION:
 
 0. Install Node (www.nodejs.org).
-1. Set IP of the websocket server in client/globals.js (WebSocketServerIP).
-2. sudo mkdir -p /www/default
-3. ./run.sh
-4. Open browser, go to http://localhost:8080/index.html
-5. Other player on the same net goes to http://WebSocketServerIP:8080/index.html.
+1. Install npm (Node package manager, http://www.github.com/isaacs/npm).
+2. npm install websocket-server
+3. npm install paperboy
+4. Set SERVER properties in ./client/globals.js
+5. ./run.sh
+6. Open browser, go to http://localhost:8080/index.html
+7. Other player on the same net goes to http://<SERVER.WS_SERVER_IP>:<SERVER.WS_SERVER_PORT>/index.html.
 
