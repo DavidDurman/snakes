@@ -2,212 +2,331 @@
  * Copyright (c) David Durman & Ales Sturala 2010.
  */
 
-var Logic = {
-    game_canvas: null,
-    field: [],
-    snake_direction: null,                                                        // right, down, left, up
-    is_dead: false,
-    refresh: null,
-    extend_snake: 0,                                                              // extend snake by given number of cells
-    consumed_flowers: 0,                                                          // number of flowers caught (used to determine when inverse flowers should appear)
-    bonus_count: 3,
-    reverse_flower_count: 5,          // nu
-    reverse_flower_steps: 15,
-    timeout_for_reverse_flowers: 0,                                               // when reverse flowers are disaplyed this number keeps how many "ticks" tje flowers disaplyed and decreases with each this, when reaches 0 should remove all reverse flowers
-    on_bonus: null,
+var Cell = {
+    
+    blank: 0,
+    wall: 1,
+    prolong: 2,
+    shorten: 3,
+    bonus: 4,
+    snakeHead: 100
+    
+};
 
-    init: function(game_canvas){
-        var i;
+var Snake = {
+    
+    // static table
+    directions: {
+        "100": { x: 1,  y: 0,  name: "right" },
+        "99":  { x: 0,  y: 1,  name: "down"  },
+        "98":  { x: 0,  y: -1, name: "up"    },
+        "97":  { x: -1, y: 0,  name: "left"  },
+        "right": 100,
+        "down":  99,
+        "up":    98,
+        "left":  97
+    },
+    
+    body: [],
+    store: function ( field ) {
         
-        this.game_canvas = game_canvas;
-
-        // initialize field with default values
-        // field consinsts of width*height points
-        for( i = 0; i < this.game_canvas.width * this.game_canvas.height; i++)         // init the field with 'nothing' in each point (code 0 denotes 'nothing')
-            this.field[i] = 0;
-
-        // init game field
-        // init wall
-        for ( i = 0; i < this.game_canvas.width; i++){                                 // horizontal walls
-            this.field[this.game_canvas.position2index(i,0)] = 1;
-            this.field[this.game_canvas.position2index(i,this.game_canvas.height-1)] = 1;
+        this.body.forEach( function( position, i, body ) {
+            field[ position.y ][ position.x ] = (i === 0) ? body[ 0 ].code || Cell.snakeHead : Cell.snakeHead + i;
+        } );
+    },
+    clean: function ( field ) {
+        this.body.forEach( function( position, i, body ) {
+            field[ position.y ][ position.x ] = Cell.blank;
+        } );
+    },
+    direction: function ( dir ) {
+        if ( dir ) {
+            this.body[ 0 ].code = this.directions[ dir ];
+            return this.directions[ this.directions[ dir ] ];
         }
-        for ( i = 0; i < this.game_canvas.height; i++){                                // horizontal walls
-            this.field[this.game_canvas.position2index(0,i)] = 1;
-            this.field[this.game_canvas.position2index(this.game_canvas.width-1,i)] = 1;
+        return this.directions[ this.body[ 0 ].code ] || { name: "unknown" };
+    },
+    move: function ( delta ) {
+        var len = this.body.length, i = len - 1;
+        
+        for ( ; i >= 0; i-- ) {
+            
+            if ( i < delta ) {
+                
+                this.body[ i ].x += this.direction().x * delta;
+                this.body[ i ].y += this.direction().y * delta;
+                
+            } else {
+
+                this.body[ i ].x = this.body[ i - delta ].x;
+                this.body[ i ].y = this.body[ i - delta ].y; 
+                
+            }
+        }
+    },
+    extend: function ( count ) {
+        var tail = this.body[ this.body.length - 1];
+        var positiveCount = Math.abs( count );
+
+        while ( positiveCount-- ) {
+            
+            if ( count > 0 ) {
+
+                this.body[ this.body.length ] = { x: tail.x, y: tail.y };
+
+            } else {
+
+                this.body.pop();
+                
+            }
+        }
+    }
+};
+
+var Logic = {
+    
+    canvas: null,
+    field: [],
+    bonus_count: 3,
+    onbonus: null,      // callback when snake has eaten a bonus
+    snake: null,
+    collected: {},      // table of collected things
+        
+    init: function(canvas){
+        var i, j;
+        this.canvas = canvas;
+
+        // Initialize game field, draw walls.
+        for ( i = 0; i < canvas.height; i++ ) {
+            this.field[ i ] = [];
+            
+            for ( j = 0; j < canvas.width; j++ ) {
+
+                if ( j === 0             ||
+                     j === canvas.height - 1 ||
+                     i === 0             ||
+                     i === canvas.width - 1) {
+                    
+                    this.field[ i ][ j ] = Cell.wall;
+                    
+                } else {
+                    this.field[ i ][ j ] = Cell.blank;
+                }
+
+            }
         }
 
-        // init snake
-        this.field[this.game_canvas.position2index(1,2)] = 104;
-        this.field[this.game_canvas.position2index(2,2)] = 103;
-        this.field[this.game_canvas.position2index(3,2)] = 102;
-        this.field[this.game_canvas.position2index(4,2)] = 101;
-        this.field[this.game_canvas.position2index(5,2)] = 100;
+        var snake = this.snake = Object.create( Snake );
 
-        this.field[this.game_canvas.position2index(5,7)] = 4;
+        /*
+        var snake2 = this.snake2 = Object.create( Snake );
+        // Initialize Snake.
+        snake2.body = [
+            { x: 6, y: 20, code: Snake.directions["right"] },
+            { x: 5, y: 20 },
+            { x: 4, y: 20 },
+            { x: 3, y: 20 },
+            { x: 2, y: 20 }
+        ];
+        snake2.store(this.field);
+        */
 
-        this.snake_direction = "right";
-        this.game_canvas.draw(this.field);
+        // Initialize Snake.
+        snake.body = [
+            { x: 6, y: 2, code: Snake.directions[ "right" ] },
+            { x: 5, y: 2 },
+            { x: 4, y: 2 },
+            { x: 3, y: 2 },
+            { x: 2, y: 2 }
+        ];
+        snake.store( this.field );
+
+        Stats.info( { snakeLength: snake.body.length } );        
+
+        this.fillRandomCell( Cell.prolong );
+        
+        canvas.draw( this.field );
+
+        this.createBonusTimeout();
 
         return this;
     },
-    tick: function(){
-        if (this.timeout_for_reverse_flowers <= 0)
-            return;
+    createBonusTimeout: function () {
+        var prolongCountElement = document.getElementById( "prolongCount" ),
+            bonusTimeoutElement = document.getElementById( "bonusTimeout" );
+        
+        prolongCountElement.max = BONUS.prolongNeeded;
+        prolongCountElement.value = 0;
+        
+        // @todo
+        var bonusTimeout = BONUS.timeout;
+        Timer.create(
+            function ( time ) {
+                return time % 1000 === 0 && bonusTimeout >= 0;
+            },
+            function ( time ) {
+                time = bonusTimeout -= 1000;    // -1s
 
-
-        if (this.timeout_for_reverse_flowers == 1)
-            while (this.field.indexOf(3) != -1){                                      // remove all flowers
-                this.field[this.field.indexOf(3)] = 0;
-            }
-        this.timeout_for_reverse_flowers--;
-        this.consumed_flowers++;
-    },
-    move: function(x_offset, y_offset){
-        if (this.is_dead)                                                           // do nothing if dead
-            return;
-
-        var index = this.field.indexOf(100);
-        var position = this.game_canvas.index2position(index);
-        position.x += x_offset;
-        position.y += y_offset;
-
-        var new_index = this.game_canvas.position2index(position.x, position.y);
-        this.move_point(new_index, 100);
-        if (this.consumed_flowers > 0 && this.consumed_flowers % this.reverse_flower_steps == 0 && this.field.count(3) < this.reverse_flower_count){        // throw reverse flowers
-            this.create_reverse_flower();
-            //console.log(this.timeout_for_reverse_flowers);
-            if (this.timeout_for_reverse_flowers <= 0)
-                this.timeout_for_reverse_flowers = 130;
-        }
-        else if (this.consumed_flowers > 0 && this.consumed_flowers % this.bonus_count == 0 && this.field.count(4) == 0)   // throw bonus
-            this.create_bonus();
-        else if (this.field.indexOf(2) == -1 && this.field.count(3) == 0)           // there is no flower and no reverse flower => create flower
-            this.create_flower();
-
-        if (this.refresh != null)                                                   // callback
-            this.refresh(this.field);
-    },
-    move_point: function(new_index, code){
-        var index = this.field.indexOf(code);
-
-        // test colisions
-        if (code == 100 && this.field[new_index] == 1){                             // wall
-            this.is_dead = true;
-            Stats.hit();
-        }
-        else if (code == 100 && this.field[new_index] == 2){                        // flower
-            this.extend_snake++;
-            this.consumed_flowers++;
-        }
-        else if (code == 100 && this.field[new_index] == 3)                         // reverse flower
-            this.extend_snake--;
-        else if (code == 100 && this.field[new_index] == 4){                        // bonus
-            this.consumed_flowers++;
-            this.on_bonus();
-        }
-        else if (code == 100 && this.field[new_index] >= 101){                       // snake body
-            this.is_dead = true;
-            Stats.hit();            
-        }
-
-        // if on tail-1 cell => test if snake is supposed to shrink => if so clear tail-1 and tail point
-        var tail_code = this.field.max();
-        if (tail_code-1 == code && this.extend_snake < 0){
-            if (tail_code == 102){                                                    // the size of the snake is 3 => do not shorter, remove all reverse flowers
-                this.extend_snake = 0;
-                while (this.field.indexOf(3) != -1){
-                    this.field[this.field.indexOf(3)] = 0;
+                if ( bonusTimeout === 0 ) {
+                    
+                    if ( this.collected[ Cell.prolong ] >= BONUS.prolongNeeded ) {
+                        
+                        this.fillRandomCell( Cell.bonus );
+                        if ( this.snake.body.length > BONUS.doubleBonusSnakeLength ) {
+                            this.fillRandomCell( Cell.bonus );
+                        }
+                        
+                    }
+                    
+                    this.collected[ Cell.prolong ] = 0;
+                    prolongCountElement.value = 0;
+                    
+                    bonusTimeout = BONUS.timeout;
                 }
-                this.field[new_index] = code;
-                this.consumed_flowers++;                                                // little hack to increase the number of flowers so reverse flowrers do not get generated
+                
+                time = time / 1000;     // ms to s
+                var seconds = time % 60,
+                    minutes = Math.floor( time / 60 );
+                
+                bonusTimeoutElement.innerHTML = minutes + ":" + ("0" + seconds).slice(-2);
+            },
+            "bonus",
+            this
+        );
+    },
+    collision: function ( point ) {
+        var snakeUnderHeadCode = this.field[ point.y ][ point.x ];
+        var snake = this.snake;
+        
+
+        switch ( snakeUnderHeadCode ) {
+            
+          case Cell.wall:
+            Controller.hit();
+            break;
+
+          case Cell.prolong:
+            this.fillRandomCell( Cell.prolong );
+            snake.extend( 1 );
+            
+            Stats.info( { snakeLength: snake.body.length } );
+            this.collected[ Cell.prolong ] = (this.collected[ Cell.prolong ] || 0) + 1;
+            document.getElementById( "prolongCount" ).value = this.collected[ Cell.prolong ];
+
+            /*
+            if ( snake.body.length >= BONUS.snakeLengthNeededToShorten ) {
+                var idx = BONUS.shortenCount;
+                while ( idx-- ) this.fillRandomCell( Cell.shorten );
             }
-            else{
-                // remove current cell and next cell (that should be last cell (tail))
-                this.field[new_index] = code;                                           // move tail-1 to new index
-                this.field[index] = 0;                                                  // clear tail-1
-                this.field[this.field.indexOf(code+1)] = 0;                             // clear tail
-                this.extend_snake++;
-                return;
-            }
+            */
+
+            // @todo
+//            if ( snake.body.length % 3 === 0 && Math.random() < 0.5 ) {
+//                this.fillRandomCell( Cell.bonus );
+//            }
+            break;
+
+          case Cell.shorten:
+            this.collected[ Cell.shorten ] = (this.collected[ Cell.shorten ] || 0) + 1;
+            snake.extend( -1 );
+            Stats.info( { snakeLength: snake.body.length } );
+            break;
+
+          case Cell.bonus:
+            if ( this.onbonus ) this.onbonus();
+            break;
+            
+        default:
+            if ( snakeUnderHeadCode > Cell.snakeHead ) {
+                Controller.hit();
+            }   
+            break;
         }
-        // tail cell
-        else if (index == -1){                                                      // processing last cell of snake
-            if (this.extend_snake >= 1){                                              // snake is supposed to be extended => leave the cell
-                this.extend_snake--;
-                this.field[new_index]++;
-            }
-            else
-                this.field[new_index] = 0;
-            return;
-            // body cell
-        } else
-            this.field[new_index] = code;
-
-        this.move_point(index, code + 1);
     },
-    right: function(){
-        if (this.snake_direction == "left")                                         // do not allow to go to opposite direction (eat itself)
-            return;
 
-        this.snake_direction = "right";
-        this.move(1,0);
-        this.game_canvas.draw(this.field, this.is_dead);
+    move: function ( snake, direction ) {
+        snake.clean( this.field );
+        snake.direction( direction );
+        snake.move( 1 );
+        this.collision( snake.body[ 0 ] );
+        snake.store( this.field );
+        this.canvas.draw( this.field );
     },
-    left: function(){
-        if (this.snake_direction == "right")                                        // do not allow to go to opposite direction (eat itself)
-            return;
 
-        this.snake_direction = "left";
-        this.move(-1,0);
-        this.game_canvas.draw(this.field, this.is_dead);
+    a: function () { this.move( this.snake2, "left" ); },
+    d: function () { this.move( this.snake2, "right" ); },
+    w: function () { this.move( this.snake2, "up" ); },
+    s: function () { this.move( this.snake2, "down" ); },    
+    
+    right: function() {
+        var snake = this.snake;
+        
+        // do not allow to go to opposite direction (eat itself)
+        if ( snake.direction().name === "left" ) {
+            return;
+        }
+        this.move( snake, "right" );
     },
-    up: function(){
-        if (this.snake_direction == "down")                                         // do not allow to go to opposite direction (eat itself)
+    left: function() {
+        var snake = this.snake;
+        
+        // do not allow to go to opposite direction (eat itself)
+        if ( snake.direction().name === "right" ) {
             return;
-
-        this.snake_direction = "up";
-        this.move(0,-1);
-        this.game_canvas.draw(this.field, this.is_dead);
+        }
+        this.move( snake, "left" );        
+    },
+    up: function() {
+        var snake = this.snake;
+        
+        // do not allow to go to opposite direction (eat itself)
+        if ( snake.direction().name === "down" ) {
+            return;
+        }
+        this.move( snake, "up" );
     },
     down: function(){
-        if (this.snake_direction == "up")                                           // do not allow to go to opposite direction (eat itself)
-                return;
-
-        this.snake_direction = "down";
-        this.move(0,1);
-        this.game_canvas.draw(this.field, this.is_dead);
+        var snake = this.snake;
+        
+        // do not allow to go to opposite direction (eat itself)
+        if ( snake.direction().name === "up" ) {
+            return;
+        }
+        this.move( snake, "down" );        
     },
-    create_flower: function(){                                                    // create one flower in the game on random position
-        var index = this.get_random_empty_index();
-        this.field[index] = 2;
+    // create one flower in the game on random position
+    create_flower: function(){
+        var pos = this.getRandomEmptyPosition();
+        this.field[ pos.y ][ pos.x ] = Cell.prolong;
     },
-    create_reverse_flower: function(){                                            // create one inverse flower in the game on random position
-        var index = this.get_random_empty_index();
-        this.field[index] = 3;
+    // create one inverse flower in the game on random position    
+    create_reverse_flower: function() {
+        var pos = this.getRandomEmptyPosition();
+        this.field[ pos.y ][ pos.x ] = Cell.shorten;
     },
-    create_bonus: function(){                                                     // create one bonus at random position
-        var index = this.get_random_empty_index();
-        this.field[index] = 4;
+    // create one bonus at random position
+    create_bonus: function() {
+        var pos = this.getRandomEmptyPosition();
+        this.field[ pos.y ][ pos.x ] = Cell.bonus;
     },
-    get_random_empty_index: function(){                                           // generate random index; regenerate if there is something on the position (code != 0) or if the possition is right near the wall
+    // generate random index;
+    // regenerate if there is something on the position (code != 0)
+    // or if the possition is right near the wall
+    getRandomEmptyPosition: function(){
+        var x, y;
+        
         do {
-            var index = Math.floor(Math.random()*this.field.length);                  // get me random number between 0..(size of fields-1 incl.)
-            var position = this.game_canvas.index2position(index);
-            var index_right = this.game_canvas.position2index(position.x+1, position.y);
-            var index_bottom = this.game_canvas.position2index(position.x, position.y+1);
-            var index_left = this.game_canvas.position2index(position.x-1, position.y);
-            var index_top = this.game_canvas.position2index(position.x, position.y-1);
+            // get me random number between 0..(size of fields-1 incl.)
+            x = Math.floor( Math.random() * this.field[ 0 ].length );
+            y = Math.floor( Math.random() * this.field.length );
 
-        } while(this.field[index] != 0 ||
-                this.field[index_right] == 1 ||
-                this.field[index_bottom] == 1 ||
-                this.field[index_left] == 1 ||
-                this.field[index_top] == 1);
+        } while ( this.field[ y ][ x ] === Cell.wall );
 
-        return index;
+
+        return { x: x, y: y };
     },
-    action_extend: function(num){
-        this.extend_snake += num;
+    fillRandomCell: function ( code ) {
+        var pos = this.getRandomEmptyPosition();
+        this.field[ pos.y ][ pos.x ] = code;
     }
 }

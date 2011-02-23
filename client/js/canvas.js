@@ -3,14 +3,14 @@
  */
 
 var GameCanvas = {
-    width: null,                                                                  // number of vertical fields
-    height: null,                                                                 // number of horizontal fields
-    canvas: null,                                                                 // html canvas
-    canvas_context: null,                                                         // canvas 2d context
-    point_width: 10,                                                              // width of point in pixels
-    point_height: 10,                                                             // height of point in pixels
+    width: null,  // number of vertical fields
+    height: null, // number of horizontal fields
+    canvas: null, // html canvas
+    canvas_context: null, // canvas 2d context
+    point_width: 10,  // width of point in pixels
+    point_height: 10, // height of point in pixels
 
-    init: function(canvas,width,height,point_width,point_height){
+    init: function( canvas, width, height, point_width, point_height ) {
         this.canvas = canvas;
         this.canvas_context = this.canvas.getContext("2d");
 
@@ -22,58 +22,25 @@ var GameCanvas = {
 
         return this;
     },
-    // from index give me position (x,y coordinates)
-    index2position: function(i)
-    {
-        var position = {
-            x: i%this.width,                                                          // from linear index compute x position
-            y: Math.floor(i/this.width)                                               // from linear index compute y position
-        }
-        return position;
-    },
-    // from position (x,y coordinates) give me index
-    position2index: function(x,y)
-    {
-        var index = (y * this.width) + x;
-        return index;
-    },
     // re-draw field
-    draw: function(field, is_dead){
-        var length = field.length;
-        if (this.width*this.height != length)                                 // test if number of elements corresponds to given width and length
-            console.log("The width and height does not correspond to a given field array");
-
+    draw: function(field){
         // clear rectangle
-        this.canvas_context.clearRect(0, 0, this.width*this.point_width, this.height*this.point_height);
-
-        var i, bodyPositions = [];
+        var height = field.length,
+            width = field[0].length;
         
-        for (i = 0; i < length; i++){                                                // draw every point
-            var position = this.index2position(i);                                    // from linear index compute y position
-            if ( field[i] > 100) {
-                position.i = field[i];
-                bodyPositions.push(position);
-            }
-            var direction,
-                right = this.position2index(position.x + 1, position.y),
-                left = this.position2index(position.x - 1, position.y),
-                up = this.position2index(position.x, position.y - 1),
-                down = this.position2index(position.x, position.y + 1);
-            
-            if (field[right] > 100)
-                direction = "left";
-            else if (field[left] > 100)
-                direction = "right";                
-            else if (field[up] > 100)
-                direction = "down";                
-            else if (field[down] > 100)
-                direction = "up";                
+        this.canvas_context.clearRect(0, 0, width * this.point_width, height * this.point_height);
+
+        var i, j;
+        
+        for ( i = 0; i < height; i++ ) {
+            for ( j = 0; j < width; j++ ) {
                 
-            this.drawPoint(position.x, position.y, field[i], direction);
+                this.drawCell( j, i, field[ i ][ j ] );
+                
+            }
         }
 
-        bodyPositions.sort( function(a, b) { return a.i < b.i; } );
-//        this.drawBody(bodyPositions);
+        return this;
     },
     drawBody: function(positions) {
         console.log(JSON.stringify(positions));
@@ -93,33 +60,52 @@ var GameCanvas = {
         ctx.closePath();
         ctx.stroke();
         ctx.fill();
-        
+
+        return this;
     },
     // draw particular one point in the field
-    drawPoint: function(x, y, code, direction){
-        if (code == 0)                                                            // none
+    drawCell: function(x, y, code){
+
+        switch ( code ) {
+            
+          case Cell.blank:
             this.drawEmptyPoint(x, y);
-        else if (code == 1)                                                       // wall
+            break;
+            
+          case Cell.wall:
             this.drawWallPoint(x, y);
-        else if (code == 2)                                                       // flower
+            break;
+
+          case Cell.prolong:
             this.drawFlowerPoint(x, y);
-        else if (code == 3)                                                       // reverse flower
+            break;
+
+          case Cell.shorten:
             this.drawReverseFlowerPoint(x, y);
-        else if (code == 4)                                                       // bonus
+            break;
+
+          case Cell.bonus:
             this.drawBonusPoint(x, y);
-        else if (code == 100)                                                     // snake's head
-            this.drawSnakeHeadPoint(x, y, direction);
-        else if (code > 100)                                                      // snake's body
-            this.drawSnakeBodyPoint(x, y);
-        else ;
-//            console.log('unknown point code');
+            break;
+
+        default:
+            if ( code > Cell.snakeHead ) {
+                
+                this.drawSnakeBodyPoint(x, y);
+                
+            } else {
+                
+                this.drawSnakeHeadPoint(x, y, code);
+                
+            }
+            break;
+        }
+
+        return this;
     },
     // draw point where nothing is
-    drawEmptyPoint: function(x,y){
-        /*this.canvas_context.globalAlpha = 0;
-          this.canvas_context.fillStyle = "#FFFFFF";
-          this.canvas_context.fillRect(x*this.point_width, y*this.point_height, this.point_width, this.point_height);
-          this.canvas_context.globalAlpha = 1;*/
+    drawEmptyPoint: function( x, y ) {
+        // nop;
     },
     // draw point where snake's body is
     drawSnakeBodyPoint: function(x, y){
@@ -164,9 +150,9 @@ var GameCanvas = {
         //this.canvas_context.fillRect(x*this.point_width, y*this.point_height, this.point_width, this.point_height);
     },
     // draw point where snake's head is
-    drawSnakeHeadPoint: function(x, y, direction){
+    drawSnakeHeadPoint: function ( x, y, code ) {
         var ctx = this.canvas_context, w = this.point_width, h = this.point_height,
-            f = SNAKE.head.factor;
+            f = SNAKE.head.factor, direction = Snake.directions[ code ].name;
         
         ctx.strokeStyle = "white";
         ctx.fillStyle = "white";
@@ -199,18 +185,6 @@ var GameCanvas = {
         ctx.stroke();
         ctx.fill();
 
-        /*
-          ctx.strokeStyle = "white";
-          ctx.fillStyle = "white";
-          ctx.beginPath();
-          ctx.arc((x * pw) + (pw / 2), (y * ph) + (ph / 2), (0.5), 0, Math.PI * 2, true);
-          ctx.closePath();
-          ctx.stroke();
-          ctx.fill();
-        */
-        
-        //this.canvas_context.fillStyle = "#008bce";
-        //this.canvas_context.fillRect(x*this.point_width, y*this.point_height, this.point_width, this.point_height);
     },
     // draw flower
     drawFlowerPoint: function(x, y) {
@@ -224,7 +198,7 @@ var GameCanvas = {
     drawWallPoint: function(x, y) {
         //this.canvas_context.fillStyle = "#55ffffff";
         this.canvas_context.fillStyle = PLAYFIELD.wall.fillStyle;
-        this.canvas_context.fillRect(x*this.point_width, y*this.point_height, this.point_width, this.point_height);
+        this.canvas_context.fillRect( x * this.point_width, y * this.point_height, this.point_width, this.point_height);
     },
     // draw bonus
     drawBonusPoint: function(x, y) {

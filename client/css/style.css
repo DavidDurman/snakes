@@ -47,7 +47,21 @@ h1 {
 }
 
 #stats { 
+  position: absolute;
+  left: 850px;
+  top: 20px;
   color: white;
+  padding: 5px 10px;
+  -webkit-box-shadow: 0px 0px 10px #888;
+/*  border: 1px solid #888; */
+}
+
+#stats .label { 
+  font-weight: bolder;
+  padding-right: 10px;
+}
+#stats .value { 
+  color: yellow;
 }
 
 .page { 
@@ -76,6 +90,17 @@ h1 {
   -webkit-box-shadow: -2px 2px 50px #1d0705;
   left: 425px;
 }
+.enemy.left-bottom {  
+  top: 280px;
+  left: -225px;
+  -webkit-box-shadow: 2px 2px 50px #1d0705;
+}
+.enemy.right-bottom {  
+  top: 280px;
+  left: 465px;
+  -webkit-box-shadow: 2px 2px 50px #1d0705;
+}
+
 
 #application {  
   -webkit-perspective: 600px;
@@ -93,4 +118,24 @@ h1 {
 /*  -webkit-transform-style: preserve-3d;  */
 /*  -webkit-transform: rotateX(30deg); */
 /*  -webkit-transition: -webkit-transform 0.7s linear; */
+}
+
+#prolongCount { 
+  width: 145px;
+}
+
+#audioStatus { 
+  position: absolute;
+  top: 10;
+  left: 10;
+  width: 20px;
+  min-height: 20px;
+  background-size: 100% 100%;
+  display: none;        /* @todo */
+}
+#audioStatus.on { 
+  background-image: url(../images/audio.png);
+}
+#audioStatus.off { 
+  background-image: url(../images/audio-mute.png);
 }

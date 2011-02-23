@@ -5,7 +5,7 @@
 var SERVER = {
     WEBROOT: '/home/dave/github/snakes/client',
     STATIC_SERVER_PORT: 8080,
-    WS_SERVER_IP: "192.168.55.100",
+    WS_SERVER_IP: "192.168.55.101",
     WS_SERVER_PORT: 8000
 };
 
@@ -24,10 +24,15 @@ var AUDIO = {
 var BONUS = {
     probabilityTable: {
         '0.15': 'rotate',
-        '0.3': 'project',
+        '0.4': 'project',
         '0.7': 'prolong',
         '1.0': 'shake'
-    }
+    },
+    timeout: 10000, // ms
+    prolongNeeded: 3,
+    snakeLengthNeededToShorten: 10,
+    shortenCount: 5,
+    doubleBonusSnakeLength: 20
 };
 
 BONUS.probabilities = Object.keys( BONUS.probabilityTable );
@@ -48,7 +53,8 @@ var SNAKE = {
         fillStyle: "white",
 
         factor: 1.5,
-        //        text: "\u00D7", // cross
+//        text: "\u00D7", // cross
+//        text: "ales",
         text: "\u2605", // star
         font: "14px Arial"
     },
@@ -62,6 +68,7 @@ var PLAYFIELD = {
     //    fillStyle: "#b8e612"
     wall: {
         fillStyle: "rgba(0, 0, 0, 0.1)"
+//        fillStyle: "rgba(255, 0, 0, 0.1)"
     }
 };
 
@@ -69,10 +76,15 @@ var PLAYERS = {
     maxCount: 3
 };
 
+var MISC = {
+    globalTimerResolution: 500
+}
+
 if ( typeof require !== "undefined" ) {
     exports.PLAYERS = PLAYERS;    
     exports.SERVER = SERVER;
     exports.SNAKE = SNAKE;
     exports.PLAYFIELD = PLAYFIELD;
-    exports.BONUS = BONUS;    
+    exports.BONUS = BONUS;
+    exports.MISC = MISC;        
 }

@@ -7,6 +7,8 @@
     <script src="./utils.js"></script>
     <script src="./globals.js"></script>
     <script src="./init.js"></script>
+    <script src="./js/timer.js"></script>
+    <script src="./js/controller.js"></script>
     <script src="./js/input.js"></script>
     <script src="./js/communicator.js"></script>
     <script src="./js/canvas.js"></script>
@@ -20,15 +22,21 @@
 
     <script src="./tests/input.js"></script>
     <script src="./tests/communicator.js"></script>
+
+<!--    <script src="./tests/ai.js"></script> -->
   </head>
 
   <body onload="system.init()">
     <div class="page">
-      <h1>Snaex</h1>
+      <h1>Sneax</h1>
+      <div id="audioStatus"></div>
       <span id="flashmessage"></span>
       <span id="cannon"></span>      
       <div id="stats">
-<!--        <span class="label">Snake length: </span><span class="value" id="snake_length">4</span> -->
+        <span class="label">Snake length: </span><span class="value" id="snakeLength">4</span><br/>
+        <span class="label">Game time: </span><span class="value" id="timestamp"></span><br/>
+        <span class="label">Bonus timeout: </span><span class="value" id="bonusTimeout"></span><br/>
+        <meter id="prolongCount"/>
       </div>
       <div id="debug"></div>
       <div id="application"></div>

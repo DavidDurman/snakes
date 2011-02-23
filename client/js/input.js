@@ -49,7 +49,14 @@ var KeyResolver = {
         40: "down",
         49: "one",
         50: "two",
-        51: "three"
+        51: "three",
+
+        65: "a",
+        68: "d",
+        83: "s",
+        87: "w",
+
+        77: "m"
     },
     get: function(delegee){
         this.delegee = delegee;

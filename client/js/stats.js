@@ -9,14 +9,18 @@ var Stats = {
     init: function() {
         this.flashmessage = document.getElementById("flashmessage");
     },
-    
+
     hit: function() {
         this.flash("You died a slow, painful death.");
-        Communicator.send({ action: "died", id: User.id });
-        Audio.play("hit");
     },
     
     flash: function( str ) {
         this.flashmessage.innerHTML = str;
+    },
+
+    info: function ( props ) {
+        Object.keys( props ).forEach( function ( k ) {
+            document.getElementById( k ).innerHTML = props[ k ];
+        } );
     }
 };

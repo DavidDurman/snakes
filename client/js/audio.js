@@ -1,4 +1,5 @@
 var Audio = {
+    mute: false,
 
     elements: {},  // HTML 5 audio elements
 
@@ -13,12 +14,21 @@ var Audio = {
             
         } );
         
-        
+        this.audioStatusElement = document.getElementById( "audioStatus" );
+        this.audioStatusElement.className = this.mute ? "off" : "on";
+    },
+
+    toggle: function () {
+        this.mute = !this.mute;
+        this.audioStatusElement.className = this.mute ? "off" : "on";
     },
 
     play: function( sound ) {
+        if ( this.mute ) {
+            return;
+        }
         if ( this.elements[ sound ] ) {
-            this.elements[ sound ].play();            
+            this.elements[ sound ].play();
         }
     }
 };
